@@ -1,4 +1,6 @@
 # pyTerminalUtils
+![GitHub last commit](https://img.shields.io/github/last-commit/Lyagva/pyTerminalUtils)
+
 ___
 ## Info
 Simple "class-based" python library with some useful terminal interactions

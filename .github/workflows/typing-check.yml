@@ -1,0 +1,34 @@
+name: check typing
+
+on:
+  push:
+    paths:
+      - '**.py'
+      - '.github/workflows/*.yml'
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/*.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10" ]
+    name: Check typing for python ${{matrix.python-version}}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip' # caching pip dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade mypy
+          python -m pip install -r requirements.txt
+      - name: Analysing the code with mypy
+        run: |
+          mypy --ignore-missing-imports $(git ls-files '*.py')
