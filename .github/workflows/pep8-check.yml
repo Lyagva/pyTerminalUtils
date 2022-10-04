@@ -1,0 +1,50 @@
+name: check pep8
+
+on:
+  push:
+    paths:
+      - '**.py'
+      - '.github/workflows/*.yml'
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/*.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: Check pep8
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8
+          cache: 'pip' # caching pip dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade pycodestyle
+      - name: check python code style
+        id: code-style
+        run: |
+          python -m pycodestyle --max-line-length=120 $(git ls-files '*.py')
+        continue-on-error: true
+      - name: Install auto-format tool
+        run: |
+          python -m pip install --upgrade autopep8
+        if: steps.code-style.outcome != 'success'
+      - name: Trying auto format code
+        run: |
+          python -m autopep8 --max-line-length=120 \
+            --in-place -v $(git ls-files *.py)
+        if: steps.code-style.outcome != 'success'
+      - name: check python code style after auto-formatting
+        run: |
+          python -m pycodestyle --max-line-length=120 $(git ls-files '*.py')
+        if: steps.code-style.outcome != 'success'
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Format code
