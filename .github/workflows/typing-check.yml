@@ -28,8 +28,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade mypy
-          python -m pip install -r requirements.txt
+          python -m pip install --upgrade mypy wheel
+          python setup.py egg_info
+          pip install -r *.egg-info/requires.txt
+          rm -rf *.egg-info/
       - name: Analysing the code with mypy
         run: |
-          mypy --ignore-missing-imports $(git ls-files '*.py')
+          python -m mypy --ignore-missing-imports $(git ls-files '*.py')
